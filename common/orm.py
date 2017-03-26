@@ -89,13 +89,20 @@ class BooleanField(Field):
         super().__init__(name, 'boolean', False, default)
 
 
+class IntField(Field):
+    def __init__(self, name=None, primary_key=False, default=0, ddl='int'):
+        super().__init__(name, ddl, primary_key, default)
+
+
 class IntegerField(Field):
     def __init__(self, name=None, primary_key=False, default=0):
         super().__init__(name, 'bigint', primary_key, default)
 
+
 class TinyIntField(Field):
     def __init__(self, name=None, primary_key=False, default=0, length=2):
         super().__init__(name, 'tinyint(' + str(length) + ')', primary_key, default)
+
 
 class FloatField(Field):
     def __init__(self, name=None, primary_key=False, default=0.0):
@@ -105,6 +112,11 @@ class FloatField(Field):
 class TextField(Field):
     def __init__(self, name=None, default=None):
         super().__init__(name, 'text', False, default)
+
+
+class TinyTextField(Field):
+    def __init__(self, name=None, default=None):
+        super().__init__(name, 'tinytext', False, default)
 
 
 class ModelMetaclass(type):
@@ -173,7 +185,13 @@ class Model(dict, metaclass=ModelMetaclass):
 
     @classmethod
     async def findAll(cls, where=None, args=None, **kw):
-        ' find objects by where clause. '
+        """
+        find objects by where clause.
+        :param where:
+        :param args:
+        :param kw:
+        :return:
+        """
         sql = [cls.__select__]
         if where:
             sql.append('where')
