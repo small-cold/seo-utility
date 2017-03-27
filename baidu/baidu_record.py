@@ -60,6 +60,7 @@ class BaiduRecord(object):
 
 async def get_result(word, page=1, retry=3, mobile=False):
     """
+    经测试，同一个条件最多到75页，每页10个，不可调，pn 每增加10，页码加1
     https://www.baidu.com/s?wd=site%3Awww.liepin.com
     &pn=40
     &oq=site%3Awww.liepin.com
@@ -76,7 +77,7 @@ async def get_result(word, page=1, retry=3, mobile=False):
     :param retry:
     :return:
     """
-    # TODO mobile 返回的是HTML 不是JSON
+    # 返回的都是HTML，需要解析为为字典使用
     if mobile:
         url = "https://m.baidu.com/s"
         headers = {
@@ -90,11 +91,12 @@ async def get_result(word, page=1, retry=3, mobile=False):
             "Host": "www.baidu.com",
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.44 Safari/537.36"
         }
-        params = {'wd': word, 'tn': 'json', 'pn': page, 'cl': 3}
+        params = {'wd': word, 'pn': page, 'cl': 3}
     try:
         # 这里也得使用异步框架，使用requests会造成协程堵塞
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=headers) as response:
+                # TODO HTML需要在解析一次
                 result = await response.json()
                 return result
                 # r = await aiohttp.request('GET', url, params=params, headers=headers)
@@ -160,7 +162,7 @@ async def query_recorded(source_url):
     if not data:
         return baidu_record
     try:
-        print(data)
+        # print(data)
         result_data = data['feed']['entry']
     except KeyError:
         baidu_record.is_recorded = '查询出错'
@@ -173,6 +175,7 @@ async def query_recorded(source_url):
                     baidu_record.url = url_indexed
                     baidu_record.title = item['title']
                     baidu_record.set_record_time(item['time'])
+                    break
 
     return baidu_record
 
