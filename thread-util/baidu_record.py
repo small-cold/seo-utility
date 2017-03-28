@@ -24,7 +24,7 @@ class BaiduRecord(object):
 
 
 def get_result(url, retry=3):
-    url = "https://www.baidu.com/s?wd={0}&tn=json".format(url)
+    url = "https://www.baidu.com/s?wd={0}".format(url)
     headers = {
         "Host": "www.baidu.com",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.44 Safari/537.36"
