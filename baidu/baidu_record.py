@@ -5,9 +5,7 @@ import aiohttp
 import time
 import hashlib
 
-from common import orm
-from common.orm import Model, IntField, StringField, TinyTextField, FloatField, TinyIntField
-from config import config
+from common.orm import Model, IntField, StringField, TinyTextField, FloatField, TinyIntField, create_pool_
 
 """
 百度收录查询工具，协程方式实现
@@ -91,12 +89,11 @@ async def get_result(word, page=1, retry=3, mobile=False):
             "Host": "www.baidu.com",
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.44 Safari/537.36"
         }
-        params = {'wd': word, 'pn': page, 'cl': 3}
+        params = {'wd': word, 'tn': 'json', 'pn': page}
     try:
         # 这里也得使用异步框架，使用requests会造成协程堵塞
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=headers) as response:
-                # TODO HTML需要在解析一次
                 result = await response.json()
                 return result
                 # r = await aiohttp.request('GET', url, params=params, headers=headers)
@@ -185,19 +182,17 @@ async def test(url):
     dou = await query_recorded(url)
     print("查询结果", url, dou.is_recorded)
 
-
-async def init(loop, configs=config.configs):
-    # 创建数据库连接
-    await orm.create_pool(loop=loop, **configs.db)
-
+async def test():
+    pass
 
 if __name__ == '__main__':
     # 获取EventLoop:
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(init(loop))
+    create_pool_(loop)
     # 执行coroutine
     # 查询猎聘两个网站的收录情况，全部
     tasks = [
+        # test()
         get_all_recorded(),
         #  get_all_recorded(word='site:m.liepin.com', is_mobile=True), # 还用不了，移动端返回的不是JSON
     ]

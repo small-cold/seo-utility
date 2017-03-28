@@ -3,11 +3,17 @@
 import logging
 import aiomysql
 
+from config import config
+
 __author__ = 'Michael Liao'
 
 
 def log(sql, args=()):
     logging.info('SQL: %s' % sql)
+
+
+def create_pool_(loop, configs=config.configs):
+    loop.run_until_complete(create_pool(loop=loop, **configs.db))
 
 
 async def create_pool(loop, **kw):
